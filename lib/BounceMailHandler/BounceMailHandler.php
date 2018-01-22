@@ -541,9 +541,11 @@ class BounceMailHandler
      */
     public function processBounce($pos, $type, $totalFetched)
     {
-        $header  = imap_header($this->mailboxLink, $pos);
-        $subject = strip_tags($header->subject);
-        $body    = '';
+        $header     = imap_header($this->mailboxLink, $pos);
+        $subject    = strip_tags($header->subject);
+        $body       = '';
+        $headerFull = imap_fetchheader($this->mailboxLink, $pos);
+        $bodyFull   = imap_body($this->mailboxLink, $pos);
 
         if ($type == 'DSN') {
             // first part of DSN (Delivery Status Notification), human-readable explanation
@@ -635,7 +637,7 @@ class BounceMailHandler
                 $this->output('Match: ' . $ruleNumber . ':' . $ruleCategory . '; ' . $bounceType . '; ' . $email);
             } else {
                 // code below will use the Callback function, but return no value
-                $params = array($pos, $bounceType, $email, $subject, $header, $remove, $ruleNumber, $ruleCategory, $totalFetched, $body);
+                $params = array($pos, $bounceType, $email, $subject, $header, $remove, $ruleNumber, $ruleCategory, $totalFetched, $body, $headerFull, $bodyFull);
                 call_user_func_array($this->actionFunction, $params);
             }
         } else {
@@ -645,7 +647,7 @@ class BounceMailHandler
 
                 return true;
             } else {
-                $params = array($pos, $bounceType, $email, $subject, $xheader, $remove, $ruleNumber, $ruleCategory, $totalFetched, $body);
+                $params = array($pos, $bounceType, $email, $subject, $xheader, $remove, $ruleNumber, $ruleCategory, $totalFetched, $body, $headerFull, $bodyFull);
 
                 return call_user_func_array($this->actionFunction, $params);
             }
