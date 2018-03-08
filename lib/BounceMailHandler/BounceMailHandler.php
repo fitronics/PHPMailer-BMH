@@ -562,7 +562,11 @@ class BounceMailHandler
             $dsnReport = imap_fetchbody($this->mailboxLink, $pos, "2");
 
             // process bounces by rules
-            $result = bmhDSNRules($dsnMsg, $dsnReport, $this->debugDsnRule);
+            try {
+                $result = bmhDSNRules($dsnMsg, $dsnReport, $this->debugDsnRule);
+            } catch (\Exception $ex) {
+                return false;
+            }
         } elseif ($type == 'BODY') {
             $structure = imap_fetchstructure($this->mailboxLink, $pos);
 
